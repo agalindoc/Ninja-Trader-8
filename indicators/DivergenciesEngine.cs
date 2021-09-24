@@ -331,8 +331,6 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             int value = -1;
             int tops = 0;
-            //for (int i=shift+lbR; i < Count - rangeUpper - rangeLower; i++)
-            //for (int i = shift + lbR; i < rangeUpper+rangeLower; i++)
             for (int i = shift + lbR; i < rangeUpper; i++)
             {
                 if (Input[i] >= Input[i + 1] && Input[i] >= Input[i + 2] && Input[i] >= Input[i - 1] && Input[i] >= Input[i - 2])
@@ -353,8 +351,6 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             int value = -1;
             int bottoms = 0;
-            //for (int i = shift + lbR; i < Count - rangeUpper-rangeLower; i++)
-            //for (int i = shift + lbR; i < rangeUpper + rangeLower; i++)
             for (int i = shift + lbR; i < rangeUpper; i++)
             {
                 if (Input[i] <= Input[i + 1] && Input[i] <= Input[i + 2] && Input[i] <= Input[i - 1] && Input[i] <= Input[i - 2])
