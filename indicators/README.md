@@ -1,6 +1,6 @@
 # Indicators for NT 8
 
-## DivergenceEngines.cs
+## DivergenciesEngines.cs
 This engine plots divergences between price and the indicator selected as Input\
 ![image](https://user-images.githubusercontent.com/69223009/134590240-b7a54c69-cb1a-44ec-a4b5-e53d716f7755.png)
 
