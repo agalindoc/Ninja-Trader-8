@@ -170,7 +170,6 @@ namespace NinjaTrader.NinjaScript.Indicators
             plotHiddenBull = true;
             plotBear = true;
             plotHiddenBear = true;
-            showDivergences = false;
             plotBullArrows = true;
             plotBearArrows = true;
             showDivergences = true;
