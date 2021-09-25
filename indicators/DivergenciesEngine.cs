@@ -157,6 +157,11 @@ namespace NinjaTrader.NinjaScript.Indicators
         [NinjaScriptProperty, Display(Name = "Max consecutive divergences", GroupName = "Divergence Parameters", Order = 15)]
         public int maxConsecutive
         { get; set; }
+
+        [NinjaScriptProperty, Display(Name = "Plot divergences on chart", GroupName = "Divergence Parameters", Order = 16)]
+        public bool plotDivLinesChart
+        { get; set; }
+
         #endregion
 
         private void SetDefaultParameters()
@@ -179,6 +184,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             hiddenBullishDivergenceLinesColor = Brushes.DarkCyan;
             hiddenBearishDivergenceLinesColor = Brushes.Magenta;
             maxConsecutive = 2;
+            plotDivLinesChart = true;
         }
 
         protected override void OnStateChange()
@@ -217,7 +223,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Divergence plot
             if (showDivergences)
             {
-                CatchBullishDivergence(2);
+                CatchBullishDivergence(2);                
                 CatchBearishDivergence(2);
             }
         }
@@ -244,7 +250,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     // plot the arrow 
                     if (plotBullArrows)
                     {
-                        Draw.ArrowUp(this, "BullA" + Math.Round(Input[currentTrough], 4) + Instrument.FullName + CurrentBar, true, 2, Low[currentTrough] - TickSize * arrowsOffset, _bullColor);
+                        Draw.ArrowUp(this, "BullA" + Math.Round(Input[currentTrough], 4) + Instrument.FullName + CurrentBar, true, 2, Low[currentTrough] - TickSize * arrowsOffset, Plots[0].Brush);
                     }
 
 
@@ -262,7 +268,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     // plot the arrow
                     if (plotBullArrows)
                     {
-                        Draw.ArrowUp(this, "HBullA" + Math.Round(Input[currentTrough], 4) + Instrument.FullName + CurrentBar, true, 2, Low[currentTrough] - TickSize * arrowsOffset, _hiddenBullColor);
+                        Draw.ArrowUp(this, "HBullA" + Math.Round(Input[currentTrough], 4) + Instrument.FullName + CurrentBar, true, 2, Low[currentTrough] - TickSize * arrowsOffset, Plots[2].Brush);
                     }
 
                 }
@@ -287,7 +293,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     // plot the arrow 
                     if (plotBearArrows)
                     {
-                        Draw.ArrowDown(this, "BearA" + Math.Round(Input[currentPeak], 4) + Instrument.FullName + CurrentBar, true, 2, High[currentPeak] + TickSize * arrowsOffset, _bearColor);
+                        Draw.ArrowDown(this, "BearA" + Math.Round(Input[currentPeak], 4) + Instrument.FullName + CurrentBar, true, 2, High[currentPeak] + TickSize * arrowsOffset, Plots[1].Brush);
                     }
 
                 }
@@ -304,7 +310,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     // plot the arrow 
                     if (plotBearArrows)
                     {
-                        Draw.ArrowDown(this, "HBearA" + Math.Round(Input[currentPeak], 4) + Instrument.FullName + CurrentBar, true, 2, High[currentPeak] + TickSize * arrowsOffset, _hiddenBearColor);
+                        Draw.ArrowDown(this, "HBearA" + Math.Round(Input[currentPeak], 4) + Instrument.FullName + CurrentBar, true, 2, High[currentPeak] + TickSize * arrowsOffset, Plots[3].Brush);
                     }
 
 
@@ -331,6 +337,8 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             int value = -1;
             int tops = 0;
+            //for (int i=shift+lbR; i < Count - rangeUpper - rangeLower; i++)
+            //for (int i = shift + lbR; i < rangeUpper+rangeLower; i++)
             for (int i = shift + lbR; i < rangeUpper; i++)
             {
                 if (Input[i] >= Input[i + 1] && Input[i] >= Input[i + 2] && Input[i] >= Input[i - 1] && Input[i] >= Input[i - 2])
@@ -351,6 +359,8 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             int value = -1;
             int bottoms = 0;
+            //for (int i = shift + lbR; i < Count - rangeUpper-rangeLower; i++)
+            //for (int i = shift + lbR; i < rangeUpper + rangeLower; i++)
             for (int i = shift + lbR; i < rangeUpper; i++)
             {
                 if (Input[i] <= Input[i + 1] && Input[i] <= Input[i + 2] && Input[i] <= Input[i - 1] && Input[i] <= Input[i - 2])
@@ -378,18 +388,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private DivergenciesEngine[] cacheDivergenciesEngine;
-		public DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
-			return DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive);
+			return DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive, plotDivLinesChart);
 		}
 
-		public DivergenciesEngine DivergenciesEngine(ISeries<double> input, bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public DivergenciesEngine DivergenciesEngine(ISeries<double> input, bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
 			if (cacheDivergenciesEngine != null)
 				for (int idx = 0; idx < cacheDivergenciesEngine.Length; idx++)
-					if (cacheDivergenciesEngine[idx] != null && cacheDivergenciesEngine[idx].showDivergences == showDivergences && cacheDivergenciesEngine[idx].lbR == lbR && cacheDivergenciesEngine[idx].lbL == lbL && cacheDivergenciesEngine[idx].rangeUpper == rangeUpper && cacheDivergenciesEngine[idx].rangeLower == rangeLower && cacheDivergenciesEngine[idx].plotBull == plotBull && cacheDivergenciesEngine[idx].plotHiddenBull == plotHiddenBull && cacheDivergenciesEngine[idx].plotBear == plotBear && cacheDivergenciesEngine[idx].plotHiddenBear == plotHiddenBear && cacheDivergenciesEngine[idx].plotBullArrows == plotBullArrows && cacheDivergenciesEngine[idx].plotBearArrows == plotBearArrows && cacheDivergenciesEngine[idx].arrowsOffset == arrowsOffset && cacheDivergenciesEngine[idx].bearishDivergenceLinesColor == bearishDivergenceLinesColor && cacheDivergenciesEngine[idx].bullishDivergenceLinesColor == bullishDivergenceLinesColor && cacheDivergenciesEngine[idx].hiddenBullishDivergenceLinesColor == hiddenBullishDivergenceLinesColor && cacheDivergenciesEngine[idx].hiddenBearishDivergenceLinesColor == hiddenBearishDivergenceLinesColor && cacheDivergenciesEngine[idx].maxConsecutive == maxConsecutive && cacheDivergenciesEngine[idx].EqualsInput(input))
+					if (cacheDivergenciesEngine[idx] != null && cacheDivergenciesEngine[idx].showDivergences == showDivergences && cacheDivergenciesEngine[idx].lbR == lbR && cacheDivergenciesEngine[idx].lbL == lbL && cacheDivergenciesEngine[idx].rangeUpper == rangeUpper && cacheDivergenciesEngine[idx].rangeLower == rangeLower && cacheDivergenciesEngine[idx].plotBull == plotBull && cacheDivergenciesEngine[idx].plotHiddenBull == plotHiddenBull && cacheDivergenciesEngine[idx].plotBear == plotBear && cacheDivergenciesEngine[idx].plotHiddenBear == plotHiddenBear && cacheDivergenciesEngine[idx].plotBullArrows == plotBullArrows && cacheDivergenciesEngine[idx].plotBearArrows == plotBearArrows && cacheDivergenciesEngine[idx].arrowsOffset == arrowsOffset && cacheDivergenciesEngine[idx].bearishDivergenceLinesColor == bearishDivergenceLinesColor && cacheDivergenciesEngine[idx].bullishDivergenceLinesColor == bullishDivergenceLinesColor && cacheDivergenciesEngine[idx].hiddenBullishDivergenceLinesColor == hiddenBullishDivergenceLinesColor && cacheDivergenciesEngine[idx].hiddenBearishDivergenceLinesColor == hiddenBearishDivergenceLinesColor && cacheDivergenciesEngine[idx].maxConsecutive == maxConsecutive && cacheDivergenciesEngine[idx].plotDivLinesChart == plotDivLinesChart && cacheDivergenciesEngine[idx].EqualsInput(input))
 						return cacheDivergenciesEngine[idx];
-			return CacheIndicator<DivergenciesEngine>(new DivergenciesEngine(){ showDivergences = showDivergences, lbR = lbR, lbL = lbL, rangeUpper = rangeUpper, rangeLower = rangeLower, plotBull = plotBull, plotHiddenBull = plotHiddenBull, plotBear = plotBear, plotHiddenBear = plotHiddenBear, plotBullArrows = plotBullArrows, plotBearArrows = plotBearArrows, arrowsOffset = arrowsOffset, bearishDivergenceLinesColor = bearishDivergenceLinesColor, bullishDivergenceLinesColor = bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor = hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor = hiddenBearishDivergenceLinesColor, maxConsecutive = maxConsecutive }, input, ref cacheDivergenciesEngine);
+			return CacheIndicator<DivergenciesEngine>(new DivergenciesEngine(){ showDivergences = showDivergences, lbR = lbR, lbL = lbL, rangeUpper = rangeUpper, rangeLower = rangeLower, plotBull = plotBull, plotHiddenBull = plotHiddenBull, plotBear = plotBear, plotHiddenBear = plotHiddenBear, plotBullArrows = plotBullArrows, plotBearArrows = plotBearArrows, arrowsOffset = arrowsOffset, bearishDivergenceLinesColor = bearishDivergenceLinesColor, bullishDivergenceLinesColor = bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor = hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor = hiddenBearishDivergenceLinesColor, maxConsecutive = maxConsecutive, plotDivLinesChart = plotDivLinesChart }, input, ref cacheDivergenciesEngine);
 		}
 	}
 }
@@ -398,14 +408,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public Indicators.DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
-			return indicator.DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive);
+			return indicator.DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive, plotDivLinesChart);
 		}
 
-		public Indicators.DivergenciesEngine DivergenciesEngine(ISeries<double> input , bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public Indicators.DivergenciesEngine DivergenciesEngine(ISeries<double> input , bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
-			return indicator.DivergenciesEngine(input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive);
+			return indicator.DivergenciesEngine(input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive, plotDivLinesChart);
 		}
 	}
 }
@@ -414,14 +424,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public Indicators.DivergenciesEngine DivergenciesEngine(bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
-			return indicator.DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive);
+			return indicator.DivergenciesEngine(Input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive, plotDivLinesChart);
 		}
 
-		public Indicators.DivergenciesEngine DivergenciesEngine(ISeries<double> input , bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive)
+		public Indicators.DivergenciesEngine DivergenciesEngine(ISeries<double> input , bool showDivergences, int lbR, int lbL, int rangeUpper, int rangeLower, bool plotBull, bool plotHiddenBull, bool plotBear, bool plotHiddenBear, bool plotBullArrows, bool plotBearArrows, int arrowsOffset, Brush bearishDivergenceLinesColor, Brush bullishDivergenceLinesColor, Brush hiddenBullishDivergenceLinesColor, Brush hiddenBearishDivergenceLinesColor, int maxConsecutive, bool plotDivLinesChart)
 		{
-			return indicator.DivergenciesEngine(input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive);
+			return indicator.DivergenciesEngine(input, showDivergences, lbR, lbL, rangeUpper, rangeLower, plotBull, plotHiddenBull, plotBear, plotHiddenBear, plotBullArrows, plotBearArrows, arrowsOffset, bearishDivergenceLinesColor, bullishDivergenceLinesColor, hiddenBullishDivergenceLinesColor, hiddenBearishDivergenceLinesColor, maxConsecutive, plotDivLinesChart);
 		}
 	}
 }
