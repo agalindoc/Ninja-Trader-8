@@ -26,6 +26,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public class SendTelegramMsg : Strategy
     {
+        int AlertBar;
 
         #region Telegram
         [Display(Name = "Telegram ID", Order = 1, GroupName = "Telegram")]
@@ -55,10 +56,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (CurrentBar < 50)
                 return;
 
-            if (CrossAbove(EMA(10), EMA(100), 1))
-                SendTelegramMessage("EMA(10) crossed above EMA(100)");
-            if (CrossBelow(EMA(10), EMA(100), 1))
-                SendTelegramMessage("EMA(10) crossed below EMA(100)");
+            if (State == State.Realtime && CurrentBar > AlertBar)
+            {
+                if (CrossAbove(EMA(10), EMA(100), 1))
+                    SendTelegramMessage(Time[0]+" EMA(10) crossed above EMA(100)");
+                if (CrossBelow(EMA(10), EMA(100), 1))
+                    SendTelegramMessage(Time[0] + "EMA(10) crossed below EMA(100)");
+
+                AlertBar = CurrentBar;
+            }
+                
         }
 
         private void SendTelegramMessage(string txtMsg)
