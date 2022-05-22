@@ -15,3 +15,6 @@ This is just the simplest way to get alerts from NinjaTrader in your telegram bo
 Replace: 
 * the Telegram ID by your ID  (@RawDataBot start then type anything and it will show your ID)
 * the Telegram Token by the token of your bot where you will get the messages (@BotFather -> start -> /newbot -> type the bot name and it will show you the token)
+
+## TrendLines2.cs
+Very useful plot of price Trend Lines, the original version was taked from http://theindicatorstore.com, i made the adjustment to alert the price cross of a trend line over previous/historic trend lines defined by the input parameter "Number of trend lines", not just the active/last trend line
